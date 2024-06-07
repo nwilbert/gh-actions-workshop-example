@@ -1,4 +1,4 @@
-name: ci-workflow
+name: ci-cd-workflow
 on: [ push, workflow_dispatch ]
 jobs:
   ci-pipeline:
