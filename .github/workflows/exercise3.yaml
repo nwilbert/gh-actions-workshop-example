@@ -1,0 +1,40 @@
+name: ci-workflow
+on: [ push, workflow_dispatch ]
+jobs:
+  ci-pipeline:
+    name: ci-pipeline
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - name: Set up node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm ci
+      - name: Check types
+        run: npm run typecheck
+      - name: Check linting
+        run: npm run lint
+      - name: Execute tests
+        run: npm run test
+      - name: Execute build
+        run: npm run build
+      - name: Upload pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'dist/'
+  cd-pipeline:
+    needs: [ci-pipeline]
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy pages
+        id: deployment
+        uses: actions/deploy-pages@v4
